@@ -10,16 +10,13 @@ pub struct ListFilesCommand {
 }
 
 impl Command  for ListFilesCommand {
-    fn execute(&self, ctx: &mut  Context,  arguments: &str) -> String {
-        let mut result = String::new();
-        let entries = get_entries_in_folder(".").expect("Get file is not working");
-                entries
+    fn execute(&self, _ctx: &mut  Context,  _arguments: &str) -> String {
+        get_entries_in_folder(".")
+                .expect("Get file is not working")
                 .iter()
-                .for_each(|entry| {
-                    let line = format_dir_entry(entry);
-                    result.push_str(&line.to_string());
-                });
-        return result;
+                .fold(String::new(), |result, entry| -> String {
+                    result + &format_dir_entry(entry)
+                })
     }
 }
 
