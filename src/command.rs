@@ -1,3 +1,5 @@
+use super::command_registry::Context;
+
 pub trait Command {
-    fn execute(&self, arguments: &str) -> String;
+    fn execute(&self, ctx: &mut  Context,  arguments: &str) -> String;
 }

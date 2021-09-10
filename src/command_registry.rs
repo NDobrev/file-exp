@@ -1,23 +1,40 @@
 use std::collections::HashMap;
-
 use super::command::Command;
+
+pub struct Context {
+    current_dir: String,
+}
+
+impl Context {
+    fn new(base: &str) -> Context {
+        Context{
+            current_dir: String::from(base),
+        }
+    }
+}
+
 
 pub struct CommandRegisty {
     register_commands: HashMap<String, Box<dyn Command>>,
+    context: Context,
 }
+
 
 impl CommandRegisty {
     pub fn new() -> CommandRegisty {
-        CommandRegisty { register_commands: HashMap::new()}
+        CommandRegisty { 
+            register_commands: HashMap::new(),
+            context: Context::new("."),
+            }
     }
 
     pub fn add_command(&mut self, name: &str, command_handler: Box<dyn Command>) {
         self.register_commands.insert(String::from(name), command_handler);
     }
 
-    pub fn handle_command(&self, line: &str) -> Result<String, String> { 
+    pub fn handle_command(&mut self, line: &str) -> Result<String, String> { 
         match self.register_commands.get(line) {
-            Some(c) => Ok(c.execute(line)),
+            Some(c) => Ok(c.execute(&mut self.context, line)),
             _ => Err(String::from("Bad command")),
         }
     }
@@ -38,7 +55,7 @@ impl IdentityCommand {
 }
 
 impl Command for IdentityCommand {
-    fn execute(&self, _arguments: &str) -> String {
+    fn execute(&self,  ctx: &mut Context, _arguments: &str) -> String {
         self.output.clone()
     }
 }
@@ -66,7 +83,7 @@ fn execute_single_command() {
 
 #[test]
 fn execute_bad_command() {
-    let f = CommandRegisty::new();
+    let mut f = CommandRegisty::new();
     assert!(f.handle_command("hello").is_err());
     drop(f);
 }
