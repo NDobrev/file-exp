@@ -2,13 +2,11 @@ use super::command::Command;
 use std::collections::HashMap;
 
 pub struct Context {
-    current_dir: String,
 }
 
 impl Context {
-    fn new(base: &str) -> Context {
+    fn new(_base: &str) -> Context {
         Context {
-            current_dir: String::from(base),
         }
     }
 }
