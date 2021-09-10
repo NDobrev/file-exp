@@ -16,11 +16,7 @@ impl Command  for ListFilesCommand {
                 entries
                 .iter()
                 .for_each(|entry| {
-                    let line = 
-                    match entry.is_file(){
-                        true => format!("\t{}\t{}\n", entry.get_size(), entry.path().into_os_string().into_string().expect("String conversion error")),
-                        false => format!("<DIR>\t\t{}\n", entry.path().into_os_string().into_string().expect("String conversion error")),
-                    };
+                    let line = format_dir_entry(entry);
                     result.push_str(&line.to_string());
                 });
         return result;
@@ -47,7 +43,14 @@ impl FileAuxiliary for std::fs::DirEntry {
     }
 }
 
-#[allow(dead_code)]
+fn format_dir_entry(entry: &DirEntry) -> String {
+    let path = entry.path().into_os_string().into_string().expect("String conversion error");
+    match entry.is_file(){
+        true => format!("\t{}\t{}\n", entry.get_size(), path),
+        false => format!("<DIR>\t\t{}\n", path),
+    }
+}
+
 fn get_entries_in_folder(path: &str) -> io::Result<Vec<DirEntry>>  {
     let entries = fs::read_dir(path)?
         .map(|res| res.map(|e| e))
